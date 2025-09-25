@@ -2,15 +2,15 @@ import csv
 import random
 from faker import Faker
 from datetime import datetime, timedelta
+import pandas as pd
 
 fake = Faker("es_CO")
 
 # -------------------------
 # Función para generar pacientes
 # -------------------------
-def generar_pacientes(num_pacientes=200, archivo="patients.csv"):
+def generar_pacientes(num_pacientes=200, archivo="data/pacientes.csv"):
     pacientes = []
-
     for i in range(1, num_pacientes + 1):
         nombre = fake.first_name()
         apellido = fake.last_name()
@@ -24,7 +24,7 @@ def generar_pacientes(num_pacientes=200, archivo="patients.csv"):
     with open(archivo, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
         writer.writerow([
-            "id_paciente", "nombre", "apellido", "documento", 
+            "id_paciente", "nombre", "apellido", "documento",
             "telefono", "correo", "fecha_nacimiento", "ciudad"
         ])
         writer.writerows(pacientes)
@@ -35,20 +35,19 @@ def generar_pacientes(num_pacientes=200, archivo="patients.csv"):
 # -------------------------
 # Función para generar citas
 # -------------------------
-def generar_citas(num_citas=200, num_pacientes=200, archivo="appointments.csv"):
+def generar_citas(num_citas=200, num_pacientes=200, archivo="data/citas.csv"):
     citas = []
-
     for i in range(1, num_citas + 1):
         id_paciente = random.randint(1, num_pacientes)
-        id_medico = random.randint(1, 100)       # médicos cargados en tu dataset
-        id_consultorio = random.randint(1, 20)   # consultorios cargados en tu dataset
+        id_medico = random.randint(1, 100)       # médicos cargados
+        id_consultorio = random.randint(1, 20)   # consultorios cargados
         fecha_cita = (datetime.today() + timedelta(days=random.randint(1, 90))).strftime("%Y-%m-%d")
         hora_cita = f"{random.randint(8, 16)}:{random.choice(['00','15','30','45'])}"
         motivo = random.choice([
-            "Control dermatológico", 
-            "Consulta estética", 
-            "Tratamiento láser", 
-            "Revisión postoperatoria", 
+            "Control dermatológico",
+            "Consulta estética",
+            "Tratamiento láser",
+            "Revisión postoperatoria",
             "Chequeo preventivo"
         ])
         citas.append([i, id_paciente, id_medico, id_consultorio, fecha_cita, hora_cita, motivo])
@@ -56,7 +55,7 @@ def generar_citas(num_citas=200, num_pacientes=200, archivo="appointments.csv"):
     with open(archivo, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
         writer.writerow([
-            "id_cita", "id_paciente", "id_medico", 
+            "id_cita", "id_paciente", "id_medico",
             "id_consultorio", "fecha_cita", "hora_cita", "motivo"
         ])
         writer.writerows(citas)
@@ -73,30 +72,27 @@ def generar_datos():
 
 
 # -------------------------
-# Punto de entrada
+# Función para cargar datos
 # -------------------------
-if __name__ == "__main__":
-    generar_datos()
-
-    import pandas as pd
-
 def cargar_datos():
-    pacientes = pd.read_csv("patients.csv")
-    citas = pd.read_csv("appointments.csv")
+    pacientes = pd.read_csv("data/pacientes.csv")
+    citas = pd.read_csv("data/citas.csv")
     return pacientes, citas
 
 
+# -------------------------
+# Punto de entrada
+# -------------------------
 if __name__ == "__main__":
-    # Generar los datos
+    # Generar los datos en /data
     generar_datos()
 
     # Cargar los datos
     pacientes, citas = cargar_datos()
 
     # Mostrar primeros registros
-    print("\n👩‍⚕️ Pacientes (primeros 5):")
-    print(pacientes.head())
+    print("\n👩‍⚕️ Pacientes (primeros 15):")
+    print(pacientes.head(15))
 
-    print("\n📅 Citas (primeros 5):")
-    print(citas.head())
-
+    print("\n📅 Citas (primeros 15):")
+    print(citas.head(15))
