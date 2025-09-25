@@ -1,0 +1,21 @@
+id_consultorio,id_clinica,nombre,ubicacion,piso,capacidad,tipo_consultorio
+1,1,Consultorio 101,Ala Norte,1,2,Dermatología general
+2,1,Consultorio 102,Ala Norte,1,3,Dermatología estética
+3,1,Consultorio 201,Ala Sur,2,2,Procedimientos menores
+4,1,Consultorio 202,Ala Sur,2,4,Consulta externa
+5,1,Consultorio 301,Ala Central,3,3,Dermatología pediátrica
+6,2,Consultorio 101,Torre A,1,2,Dermatología estética
+7,2,Consultorio 102,Torre A,1,3,Estética avanzada
+8,2,Consultorio 201,Torre B,2,2,Láser dermatológico
+9,2,Consultorio 202,Torre B,2,4,Consulta externa
+10,2,Consultorio 301,Torre C,3,3,Peeling y rejuvenecimiento
+11,2,Consultorio 302,Torre C,3,2,Tratamientos capilares
+12,3,Consultorio 101,Edificio Principal,1,2,Dermatología oncológica
+13,3,Consultorio 102,Edificio Principal,1,3,Procedimientos quirúrgicos
+14,3,Consultorio 201,Edificio Oncológico,2,2,Consulta especializada
+15,3,Consultorio 202,Edificio Oncológico,2,4,Terapias complementarias
+16,3,Consultorio 301,Edificio Central,3,3,Control postoperatorio
+17,1,Consultorio 401,Ala Especializada,4,2,Cirugía dermatológica
+18,2,Consultorio 401,Torre D,4,3,Dermatología estética
+19,3,Consultorio 401,Edificio Central,4,2,Oncología avanzada
+20,1,Consultorio 501,Ala Norte,5,4,Investigación dermatológica
