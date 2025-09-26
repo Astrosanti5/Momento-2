@@ -176,3 +176,41 @@ def cargar_y_preprocesar():
 if __name__ == "__main__":
     # Generar los datos (si ya existen los CSV puedes comentar esta línea)
     generar_datos()
+
+    # ============================================================
+# Punto de entrada
+# ============================================================
+if __name__ == "__main__":
+    # Generar los datos (si ya existen, puedes comentar esta línea)
+    generar_datos()
+
+    # Cargar y limpiar los datos
+    pacientes, citas = cargar_y_preprocesar()
+
+    # ========================================================
+    # 1. Análisis de Frecuencia:
+    # ¿Cuál es el motivo de cita más frecuente?
+    # ========================================================
+    motivo_mas_frecuente = citas["motivo"].value_counts().idxmax()
+    print("\n📊 Análisis de Frecuencia")
+    print("Motivo más frecuente de cita:", motivo_mas_frecuente)
+
+    # ========================================================
+    # 2. Análisis de Agregación:
+    # Número de citas por ciudad del paciente
+    # (requiere merge entre citas y pacientes)
+    # ========================================================
+    merged = citas.merge(pacientes, on="id_paciente", how="inner")
+    citas_por_ciudad = merged.groupby("ciudad")["id_cita"].count()
+    print("\n📊 Análisis de Agregación")
+    print("Número de citas por ciudad:")
+    print(citas_por_ciudad)
+
+    # ========================================================
+    # 3. Análisis con Filtrado y Conteo:
+    # ¿Cuántas citas son de 'Control dermatológico'?
+    # ========================================================
+    control_count = citas[citas["motivo"] == "Control dermatológico"].shape[0]
+    print("\n📊 Análisis con Filtrado y Conteo")
+    print("Número de controles dermatológicos:", control_count)
+
