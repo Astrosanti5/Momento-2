@@ -1,0 +1,18 @@
+from sqlalchemy import Column, Integer, String, Text, Date, ForeignKey
+from sqlalchemy.orm import relationship
+from config.db import Base
+
+class Diagnostico(Base):
+    __tablename__ = "diagnostico"
+
+    id_diagnostico = Column(Integer, primary_key=True, autoincrement=True)
+    id_paciente = Column(Integer, ForeignKey("paciente.id_paciente"), nullable=False)
+    id_medico = Column(Integer, ForeignKey("medico.id_medico"), nullable=False)
+    fecha = Column(Date, nullable=False)
+    descripcion = Column(Text, nullable=False)
+    tratamiento = Column(Text, nullable=False)
+    observaciones = Column(Text)
+
+    # Relaciones
+    paciente = relationship("Paciente", back_populates="diagnosticos")
+    medico = relationship("Medico", back_populates="diagnosticos")

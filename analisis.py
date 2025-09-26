@@ -4,11 +4,15 @@ from faker import Faker
 from datetime import datetime, timedelta
 import pandas as pd
 
+# Importar conexión y modelo de Diagnóstico
+from config.db import SessionLocal
+from models.diagnostico import Diagnostico
+
 fake = Faker("es_CO")
 
-# -------------------------
+# ============================================================
 # Función para generar pacientes
-# -------------------------
+# ============================================================
 def generar_pacientes(num_pacientes=200, archivo="data/pacientes.csv"):
     pacientes = []
     for i in range(1, num_pacientes + 1):
@@ -32,9 +36,9 @@ def generar_pacientes(num_pacientes=200, archivo="data/pacientes.csv"):
     print(f"✅ Se generaron {num_pacientes} pacientes en {archivo}")
 
 
-# -------------------------
+# ============================================================
 # Función para generar citas
-# -------------------------
+# ============================================================
 def generar_citas(num_citas=200, num_pacientes=200, archivo="data/citas.csv"):
     citas = []
     for i in range(1, num_citas + 1):
@@ -63,36 +67,63 @@ def generar_citas(num_citas=200, num_pacientes=200, archivo="data/citas.csv"):
     print(f"✅ Se generaron {num_citas} citas en {archivo}")
 
 
-# -------------------------
+# ============================================================
+# Función para generar diagnósticos (BD con SQLAlchemy)
+# ============================================================
+def generar_diagnosticos(num_diagnosticos=200):
+    db = SessionLocal()
+    pacientes_ids = list(range(1, 201))   # 200 pacientes
+    medicos_ids = list(range(1, 101))     # 100 médicos
+
+    diagnosticos = []
+    for _ in range(num_diagnosticos):
+        diagnostico = Diagnostico(
+            id_paciente=random.choice(pacientes_ids),
+            id_medico=random.choice(medicos_ids),
+            fecha=fake.date_between(start_date="-2y", end_date="today"),
+            descripcion=fake.sentence(nb_words=10),
+            tratamiento=fake.text(max_nb_chars=100),
+            observaciones=fake.sentence(nb_words=8)
+        )
+        diagnosticos.append(diagnostico)
+
+    db.add_all(diagnosticos)
+    db.commit()
+    db.close()
+
+    print(f"✅ Se insertaron {num_diagnosticos} diagnósticos en la base de datos")
+
+
+# ============================================================
 # Función principal
-# -------------------------
+# ============================================================
 def generar_datos():
     generar_pacientes()
     generar_citas()
+    generar_diagnosticos()
 
 
-# -------------------------
-# Función para cargar datos
-# -------------------------
+# ============================================================
+# Función para cargar CSV
+# ============================================================
 def cargar_datos():
     pacientes = pd.read_csv("data/pacientes.csv")
     citas = pd.read_csv("data/citas.csv")
     return pacientes, citas
 
 
-# -------------------------
+# ============================================================
 # Punto de entrada
-# -------------------------
+# ============================================================
 if __name__ == "__main__":
-    # Generar los datos en /data
+    # Generar los datos
     generar_datos()
 
-    # Cargar los datos
+    # Cargar CSV y mostrar registros
     pacientes, citas = cargar_datos()
 
-    # Mostrar primeros registros
-    print("\n👩‍⚕️ Pacientes (primeros 15):")
-    print(pacientes.head(15))
+    print("\n👩‍⚕️ Pacientes (primeros 20):")
+    print(pacientes.head(20))
 
-    print("\n📅 Citas (primeros 15):")
-    print(citas.head(15))
+    print("\n📅 Citas (primeros 20):")
+    print(citas.head(20))
