@@ -170,19 +170,12 @@ def cargar_y_preprocesar():
     return pacientes, citas
 
 
-# ============================================================
-# Punto de entrada
-# ============================================================
-if __name__ == "__main__":
-    # Generar los datos (si ya existen los CSV puedes comentar esta línea)
-    generar_datos()
 
-    # ============================================================
 # Punto de entrada
 # ============================================================
 if __name__ == "__main__":
     # Generar los datos (si ya existen, puedes comentar esta línea)
-    generar_datos()
+    #generar_datos()
 
     # Cargar y limpiar los datos
     pacientes, citas = cargar_y_preprocesar()
