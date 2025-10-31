@@ -1,216 +1,91 @@
-import csv
-import random
-import os
-from faker import Faker
-from datetime import datetime, timedelta
+# analisis.py
 import pandas as pd
-
-# SQLAlchemy (configurable via DATABASE_URL)
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-
-# Intento de importar el modelo Diagnostico (si está disponible)
-diagnosticos_df = pd.read_csv("data/diagnostico.csv")
-
-# Intentar importar el modelo Diagnostico
-try:
-    diagnosticos_df = pd.read_csv("data/diagnostico.csv")
-    DIAGNOSTICO_AVAILABLE = True
-except Exception:
-    diagnosticos_df = None
-    DIAGNOSTICO_AVAILABLE = False
-
-def mostrar_diagnosticos(n=5):
-    """Muestra los primeros n diagnósticos del archivo CSV."""
-    print(diagnosticos_df.head(n))
-
-def generar_diagnosticos(num_diagnosticos=200):
-    print("⚠️  No se utiliza el modelo Diagnostico. Función vacía o pendiente de implementación.")
-
-# Importar módulo de preprocesamiento (asegúrate que src/__init__.py existe)
-try:
-    from data import preprocesamiento as pp
-except Exception as e:
-    raise ImportError(
-        "No se pudo importar src.preprocesamiento. "
-        "Asegúrate que src/preprocesamiento.py existe y src es un paquete."
-    ) from e
-
-fake = Faker("es_CO")
-
-# -------------------------
-# Configuración de la BD
-# -------------------------
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./test.db")
-engine = create_engine(
-    DATABASE_URL,
-    connect_args={"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {}
+from data.preprocesamiento import (
+    cargar_datos,
+    manejar_valores_nulos,
+    estandarizar_texto,
+    limpieza_especifica
 )
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
+# ==========================================
+# 🔹 FUNCIONES DE ANÁLISIS PRINCIPALES
+# ==========================================
 
-# ============================================================
-# Función para generar pacientes
-# ============================================================
-def generar_pacientes(num_pacientes=200, archivo="data/pacientes.csv"):
-    os.makedirs(os.path.dirname(archivo), exist_ok=True)
-    pacientes = []
-    for i in range(1, num_pacientes + 1):
-        nombre = fake.first_name()
-        apellido = fake.last_name()
-        documento = str(10000000 + i)
-        telefono = str(3000000000 + i)
-        correo = f"{nombre.lower()}.{apellido.lower()}@mail.com"
-        fecha_nacimiento = fake.date_of_birth(minimum_age=18, maximum_age=80).strftime("%Y-%m-%d")
-        ciudad = fake.city()
-        pacientes.append([i, nombre, apellido, documento, telefono, correo, fecha_nacimiento, ciudad])
+# 1️⃣ Muestra información general del DataFrame
+def resumen_general(df: pd.DataFrame, nombre_df: str = "DataFrame"):
+    print(f"\n=== Resumen general de {nombre_df} ===")
+    print(df.info())
+    print("\nPrimeras filas:")
+    print(df.head())
+    print("\nEstadísticas descriptivas:")
+    print(df.describe(include="all", datetime_is_numeric=True))
 
-    with open(archivo, "w", newline="", encoding="utf-8") as f:
-        writer = csv.writer(f)
-        writer.writerow([
-            "id_paciente", "nombre", "apellido", "documento",
-            "telefono", "correo", "fecha_nacimiento", "ciudad"
-        ])
-        writer.writerows(pacientes)
+# 2️⃣ Cuenta la cantidad de valores nulos por columna
+def valores_nulos(df: pd.DataFrame):
+    print("\n=== Valores nulos por columna ===")
+    print(df.isnull().sum())
 
-    print(f"✅ Se generaron {num_pacientes} pacientes en {archivo}")
+# 3️⃣ Calcula cuántos pacientes hay por EPS o ciudad (si existen esas columnas)
+def distribucion_por_columna(df: pd.DataFrame, columna: str):
+    if columna in df.columns:
+        print(f"\n=== Distribución por {columna} ===")
+        print(df[columna].value_counts())
+    else:
+        print(f"\n⚠️ La columna '{columna}' no existe en el DataFrame.")
 
+# 4️⃣ Analiza la frecuencia de citas por paciente
+def citas_por_paciente(citas: pd.DataFrame):
+    if "id_paciente" in citas.columns:
+        print("\n=== Número de citas por paciente ===")
+        resumen = citas["id_paciente"].value_counts().reset_index()
+        resumen.columns = ["id_paciente", "cantidad_citas"]
+        print(resumen.head())
+        return resumen
+    else:
+        print("⚠️ La columna 'id_paciente' no existe en el archivo de citas.")
+        return pd.DataFrame()
 
-# ============================================================
-# Función para generar citas
-# ============================================================
-def generar_citas(num_citas=200, num_pacientes=200, archivo="data/citas.csv"):
-    os.makedirs(os.path.dirname(archivo), exist_ok=True)
-    citas = []
-    for i in range(1, num_citas + 1):
-        id_paciente = random.randint(1, num_pacientes)
-        id_medico = random.randint(1, 100)       # médicos cargados
-        id_consultorio = random.randint(1, 20)   # consultorios cargados
-        fecha_cita = (datetime.today() + timedelta(days=random.randint(1, 90))).strftime("%Y-%m-%d")
-        hora_cita = f"{random.randint(8, 16)}:{random.choice(['00', '15', '30', '45'])}"
-        motivo = random.choice([
-            "Control dermatológico",
-            "Consulta estética",
-            "Tratamiento láser",
-            "Revisión postoperatoria",
-            "Chequeo preventivo"
-        ])
-        citas.append([i, id_paciente, id_medico, id_consultorio, fecha_cita, hora_cita, motivo])
+# 5️⃣ Muestra la cantidad de citas por mes (si existe 'fecha_cita')
+def citas_por_mes(citas: pd.DataFrame):
+    if "fecha_cita" in citas.columns:
+        citas["fecha_cita"] = pd.to_datetime(citas["fecha_cita"], errors="coerce")
+        resumen = citas["fecha_cita"].dt.to_period("M").value_counts().sort_index()
+        print("\n=== Citas por mes ===")
+        print(resumen)
+        return resumen
+    else:
+        print("⚠️ No existe la columna 'fecha_cita'.")
+        return pd.Series()
 
-    with open(archivo, "w", newline="", encoding="utf-8") as f:
-        writer = csv.writer(f)
-        writer.writerow([
-            "id_cita", "id_paciente", "id_medico",
-            "id_consultorio", "fecha_cita", "hora_cita", "motivo"
-        ])
-        writer.writerows(citas)
-
-    print(f"✅ Se generaron {num_citas} citas en {archivo}")
-
-
-# ============================================================
-# Función para generar diagnósticos (BD con SQLAlchemy)
-# ============================================================
-def generar_diagnosticos(num_diagnosticos=200):
-    if not DIAGNOSTICO_AVAILABLE:
-        print("⚠️  Modelo Diagnostico no disponible — se omite la inserción en BD.")
-        return
-
-    session = SessionLocal()
-    try:
-        pacientes_ids = list(range(1, 201))   # 200 pacientes
-        medicos_ids = list(range(1, 101))     # 100 médicos
-
-        diagnosticos = []
-        for _ in range(num_diagnosticos):
-            diagnostico = diagnostico(
-                id_paciente=random.choice(pacientes_ids),
-                id_medico=random.choice(medicos_ids),
-                fecha=fake.date_between(start_date="-2y", end_date="today"),
-                descripcion=fake.sentence(nb_words=10),
-                tratamiento=fake.text(max_nb_chars=100),
-                observaciones=fake.sentence(nb_words=8)
-            )
-            diagnosticos.append(diagnostico)
-
-        session.add_all(diagnosticos)
-        session.commit()
-        print(f"✅ Se insertaron {num_diagnosticos} diagnósticos en la base de datos")
-    except Exception as e:
-        session.rollback()
-        print("❌ Error al insertar diagnósticos en la BD:", e)
-    finally:
-        session.close()
-
-
-# ============================================================
-# Función principal
-# ============================================================
-def generar_datos():
-    generar_pacientes()
-    generar_citas()
-    generar_diagnosticos()
-
-
-# ============================================================
-# Cargar y preprocesar (usa funciones desde src.preprocesamiento)
-# ============================================================
-def cargar_y_preprocesar():
-    pacientes, citas = pp.cargar_datos(
-        ruta_pacientes="data/pacientes.csv",
-        ruta_citas="data/citas.csv"
-    )
-
-    pacientes = pp.manejar_valores_nulos(pacientes, metodo="fill", fill_value="desconocido")
-    citas = pp.manejar_valores_nulos(citas, metodo="drop")
-
-    pacientes = pp.estandarizar_texto(pacientes, ["nombre", "apellido", "ciudad"])
-    pacientes = pp.limpieza_especifica(pacientes, "telefono", simbolo="$")
-
-    return pacientes, citas
-
-
-# ============================================================
-# Punto de entrada
-# ============================================================
+# ==========================================
+# 🔹 BLOQUE PRINCIPAL DE EJECUCIÓN
+# ==========================================
 if __name__ == "__main__":
-    # Generar los datos (si ya existen los CSV puedes comentar esta línea)
-    generar_datos()
+    # Cargar datos
+    pacientes, citas = cargar_datos()
 
-    # ============================================================
-# Punto de entrada
-# ============================================================
-if __name__ == "__main__":
-    # Generar los datos (si ya existen, puedes comentar esta línea)
-    generar_datos()
+    # Preprocesamiento básico
+    pacientes = manejar_valores_nulos(pacientes, metodo="fill")
+    pacientes = estandarizar_texto(pacientes, ["nombre", "apellido"])
+    citas = manejar_valores_nulos(citas, metodo="fill")
 
-    # Cargar y limpiar los datos
-    pacientes, citas = cargar_y_preprocesar()
+    # Limpiar símbolos si hay columnas de costo o teléfono
+    if "telefono" in pacientes.columns:
+        pacientes = limpieza_especifica(pacientes, "telefono", simbolo="$")
+    if "costo" in citas.columns:
+        citas = limpieza_especifica(citas, "costo", simbolo="$")
 
-    # ========================================================
-    # 1. Análisis de Frecuencia:
-    # ¿Cuál es el motivo de cita más frecuente?
-    # ========================================================
-    motivo_mas_frecuente = citas["motivo"].value_counts().idxmax()
-    print("\n📊 Análisis de Frecuencia")
-    print("Motivo más frecuente de cita:", motivo_mas_frecuente)
+    # Análisis general
+    resumen_general(pacientes, "Pacientes")
+    resumen_general(citas, "Citas")
 
-    # ========================================================
-    # 2. Análisis de Agregación:
-    # Número de citas por ciudad del paciente
-    # (requiere merge entre citas y pacientes)
-    # ========================================================
-    merged = citas.merge(pacientes, on="id_paciente", how="inner")
-    citas_por_ciudad = merged.groupby("ciudad")["id_cita"].count()
-    print("\n📊 Análisis de Agregación")
-    print("Número de citas por ciudad:")
-    print(citas_por_ciudad)
+    # Conteo de valores nulos
+    valores_nulos(pacientes)
+    valores_nulos(citas)
 
-    # ========================================================
-    # 3. Análisis con Filtrado y Conteo:
-    # ¿Cuántas citas son de 'Control dermatológico'?
-    # ========================================================
-    control_count = citas[citas["motivo"] == "Control dermatológico"].shape[0]
-    print("\n📊 Análisis con Filtrado y Conteo")
-    print("Número de controles dermatológicos:", control_count)
+    # Distribución por EPS (si existe)
+    distribucion_por_columna(pacientes, "eps")
 
+    # Análisis de citas
+    citas_por_paciente(citas)
+    citas_por_mes(citas)
