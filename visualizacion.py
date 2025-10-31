@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
@@ -45,6 +46,9 @@ if __name__ == "__main__":
     grafico_frecuencia(df, "genero", "Distribución por Género")
     grafico_distribucion(df, "edad", "Distribución de Edad")
 =======
+=======
+
+>>>>>>> 8392cb88ac37cd0533da496600641c6778a0521e
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -114,4 +118,7 @@ if __name__ == "__main__":
     # Llamar las dos funciones de graficado
     graficar_frecuencia_motivos(citas)
     graficar_distribucion_por_ciudad(merged)
+<<<<<<< HEAD
 >>>>>>> bac5252b8b34a06c78a43a52917887fe45807db2
+=======
+>>>>>>> 8392cb88ac37cd0533da496600641c6778a0521e
