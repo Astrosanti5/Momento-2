@@ -1,91 +1,91 @@
-# analisis.py
 import pandas as pd
-from data.preprocesamiento import (
-    cargar_datos,
-    manejar_valores_nulos,
-    estandarizar_texto,
-    limpieza_especifica
-)
+import matplotlib.pyplot as plt
 
-# ==========================================
-# 🔹 FUNCIONES DE ANÁLISIS PRINCIPALES
-# ==========================================
+# =========================
+#  CARGA DE DATOS
+# =========================
+try:
+    citas = pd.read_csv("citas.csv")
+    print("✅ Archivo cargado correctamente.\n")
+except FileNotFoundError:
+    print("❌ No se encontró el archivo 'citas.csv'. Asegúrate de tenerlo en la misma carpeta que analisis.py.")
+    exit()
 
-# 1️⃣ Muestra información general del DataFrame
-def resumen_general(df: pd.DataFrame, nombre_df: str = "DataFrame"):
-    print(f"\n=== Resumen general de {nombre_df} ===")
-    print(df.info())
-    print("\nPrimeras filas:")
-    print(df.head())
-    print("\nEstadísticas descriptivas:")
-    print(df.describe(include="all", datetime_is_numeric=True))
+# =========================
+#  VISTA INICIAL DE LOS DATOS
+# =========================
+print("Primeras 5 filas del archivo:")
+print(citas.head(), "\n")
 
-# 2️⃣ Cuenta la cantidad de valores nulos por columna
-def valores_nulos(df: pd.DataFrame):
-    print("\n=== Valores nulos por columna ===")
-    print(df.isnull().sum())
+print("Información general del DataFrame:")
+print(citas.info(), "\n")
 
-# 3️⃣ Calcula cuántos pacientes hay por EPS o ciudad (si existen esas columnas)
-def distribucion_por_columna(df: pd.DataFrame, columna: str):
-    if columna in df.columns:
-        print(f"\n=== Distribución por {columna} ===")
-        print(df[columna].value_counts())
-    else:
-        print(f"\n⚠️ La columna '{columna}' no existe en el DataFrame.")
+# =========================
+#  LIMPIEZA DE DATOS
+# =========================
+# Convertir fechas y horas a tipo datetime si es necesario
+citas["fecha_cita"] = pd.to_datetime(citas["fecha_cita"], errors='coerce')
+citas["hora_cita"] = pd.to_datetime(citas["hora_cita"], errors='coerce').dt.time
 
-# 4️⃣ Analiza la frecuencia de citas por paciente
-def citas_por_paciente(citas: pd.DataFrame):
-    if "id_paciente" in citas.columns:
-        print("\n=== Número de citas por paciente ===")
-        resumen = citas["id_paciente"].value_counts().reset_index()
-        resumen.columns = ["id_paciente", "cantidad_citas"]
-        print(resumen.head())
-        return resumen
-    else:
-        print("⚠️ La columna 'id_paciente' no existe en el archivo de citas.")
-        return pd.DataFrame()
+# Eliminar filas con fechas inválidas
+citas = citas.dropna(subset=["fecha_cita"])
 
-# 5️⃣ Muestra la cantidad de citas por mes (si existe 'fecha_cita')
-def citas_por_mes(citas: pd.DataFrame):
-    if "fecha_cita" in citas.columns:
-        citas["fecha_cita"] = pd.to_datetime(citas["fecha_cita"], errors="coerce")
-        resumen = citas["fecha_cita"].dt.to_period("M").value_counts().sort_index()
-        print("\n=== Citas por mes ===")
-        print(resumen)
-        return resumen
-    else:
-        print("⚠️ No existe la columna 'fecha_cita'.")
-        return pd.Series()
+# =========================
+#  ANÁLISIS GENERAL
+# =========================
+print("📊 Total de citas registradas:", len(citas))
+print("👨‍⚕️ Médicos únicos:", citas["id_medico"].nunique())
+print("🧍 Pacientes únicos:", citas["id_paciente"].nunique(), "\n")
 
-# ==========================================
-# 🔹 BLOQUE PRINCIPAL DE EJECUCIÓN
-# ==========================================
-if __name__ == "__main__":
-    # Cargar datos
-    pacientes, citas = cargar_datos()
+# =========================
+#  CITAS POR MÉDICO
+# =========================
+citas_por_medico = citas["id_medico"].value_counts()
+print("Citas por médico:\n", citas_por_medico, "\n")
 
-    # Preprocesamiento básico
-    pacientes = manejar_valores_nulos(pacientes, metodo="fill")
-    pacientes = estandarizar_texto(pacientes, ["nombre", "apellido"])
-    citas = manejar_valores_nulos(citas, metodo="fill")
+# Gráfico de citas por médico
+plt.figure(figsize=(8, 4))
+citas_por_medico.plot(kind="bar", color="skyblue")
+plt.title("Número de citas por médico")
+plt.xlabel("ID Médico")
+plt.ylabel("Cantidad de citas")
+plt.tight_layout()
+plt.show()
 
-    # Limpiar símbolos si hay columnas de costo o teléfono
-    if "telefono" in pacientes.columns:
-        pacientes = limpieza_especifica(pacientes, "telefono", simbolo="$")
-    if "costo" in citas.columns:
-        citas = limpieza_especifica(citas, "costo", simbolo="$")
+# =========================
+#  CITAS POR DÍA
+# =========================
+citas_por_dia = citas.groupby("fecha_cita").size()
+print("Citas por día:\n", citas_por_dia, "\n")
 
-    # Análisis general
-    resumen_general(pacientes, "Pacientes")
-    resumen_general(citas, "Citas")
+plt.figure(figsize=(8, 4))
+citas_por_dia.plot(kind="line", marker="o")
+plt.title("Cantidad de citas por día")
+plt.xlabel("Fecha")
+plt.ylabel("Número de citas")
+plt.tight_layout()
+plt.show()
 
-    # Conteo de valores nulos
-    valores_nulos(pacientes)
-    valores_nulos(citas)
+# =========================
+#  HORAS MÁS FRECUENTES
+# =========================
+if "hora_cita" in citas.columns:
+    horas = citas["hora_cita"].astype(str).value_counts().head(5)
+    print("🕒 Horas más frecuentes de cita:\n", horas, "\n")
 
-    # Distribución por EPS (si existe)
-    distribucion_por_columna(pacientes, "eps")
+# =========================
+#  MOTIVOS DE CONSULTA
+# =========================
+if "motivo" in citas.columns:
+    motivos = citas["motivo"].value_counts()
+    print("Motivos más comunes de cita:\n", motivos, "\n")
 
-    # Análisis de citas
-    citas_por_paciente(citas)
-    citas_por_mes(citas)
+    plt.figure(figsize=(6, 4))
+    motivos.head(5).plot(kind="barh", color="lightgreen")
+    plt.title("Motivos más comunes de cita")
+    plt.xlabel("Cantidad")
+    plt.ylabel("Motivo")
+    plt.tight_layout()
+    plt.show()
+
+print("✅ Análisis completado exitosamente.")
