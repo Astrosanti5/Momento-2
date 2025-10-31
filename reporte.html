@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporte de Análisis de Citas Médicas</title>
+    <link rel="stylesheet" href="estilos.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.dataTables.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+</head>
+<body>
+    <header>
+        <h1>📊 Reporte de Citas Médicas</h1>
+        <p>Visualización generada automáticamente a partir de los datos limpios.</p>
+    </header>
+
+    <section class="resumen">
+        <h2>Resumen General de Pacientes</h2>
+        <div id="tabla-container">
+            {{TABLA_HTML}}
+        </div>
+    </section>
+
+    <section class="graficos">
+        <h2>Visualizaciones de Datos</h2>
+
+        <div class="grafico">
+            <h3>Frecuencia de Motivos de Cita</h3>
+            <img src="assets/frecuencia_motivos.png" alt="Gráfico de motivos de cita">
+        </div>
+
+        <div class="grafico">
+            <h3>Distribución de Citas por Ciudad</h3>
+            <img src="assets/distribucion_ciudad.png" alt="Gráfico de citas por ciudad">
+        </div>
+    </section>
+
+    <footer>
+        <p>Generado automáticamente por <strong>generar_reporte.py</strong> — Proyecto de Análisis de Datos Médicos.</p>
+    </footer>
+
+    <script>
+        $(document).ready(function() {
+            $('table').DataTable({
+                language: { url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json' }
+            });
+        });
+    </script>
+</body>
+</html>
