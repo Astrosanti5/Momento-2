@@ -1,6 +1,10 @@
+# data/preprocesamiento.py
 import pandas as pd
+from typing import Tuple, List
 
+# ----------------------------------------------------------
 # Maneja los valores nulos en un DataFrame
+# ----------------------------------------------------------
 def manejar_valores_nulos(df: pd.DataFrame, metodo: str = "fill", fill_value=None) -> pd.DataFrame:
     if metodo == "fill":
         return df.fillna(fill_value if fill_value is not None else "desconocido")
@@ -9,40 +13,56 @@ def manejar_valores_nulos(df: pd.DataFrame, metodo: str = "fill", fill_value=Non
     else:
         raise ValueError("El parámetro 'metodo' debe ser 'fill' o 'drop'.")
 
+
+# ----------------------------------------------------------
 # Convierte texto a minúsculas y elimina espacios extra
-def estandarizar_texto(df: pd.DataFrame, columnas: list[str]) -> pd.DataFrame:
+# ----------------------------------------------------------
+def estandarizar_texto(df: pd.DataFrame, columnas: List[str]) -> pd.DataFrame:
     for col in columnas:
         if col in df.columns:
             df[col] = df[col].astype(str).str.lower().str.strip()
     return df
 
+
+# ----------------------------------------------------------
 # Elimina un símbolo específico de una columna
+# ----------------------------------------------------------
 def limpieza_especifica(df: pd.DataFrame, columna: str, simbolo: str = "$") -> pd.DataFrame:
     if columna in df.columns:
         df[columna] = df[columna].astype(str).str.replace(simbolo, "", regex=False).str.strip()
     return df
 
+
+# ----------------------------------------------------------
 # Carga los archivos CSV de pacientes y citas
-def cargar_datos(ruta_pacientes: str = "data/pacientes.csv", ruta_citas: str = "data/citas.csv") -> tuple[pd.DataFrame, pd.DataFrame]:
-    pacientes = pd.read_csv(ruta_pacientes)
-    citas = pd.read_csv(ruta_citas)
+# ----------------------------------------------------------
+def cargar_datos(ruta_pacientes: str = "data/pacientes.csv", ruta_citas: str = "data/citas.csv") -> Tuple[pd.DataFrame, pd.DataFrame]:
+    try:
+        pacientes = pd.read_csv(ruta_pacientes)
+        citas = pd.read_csv(ruta_citas)
+    except FileNotFoundError as e:
+        print(f"❌ Error al cargar archivos CSV: {e}")
+        raise
     return pacientes, citas
 
-# Prueba rápida del módulo
+
+# ----------------------------------------------------------
+# Función principal de carga y limpieza
+# ----------------------------------------------------------
+def cargar_datos_limpios() -> Tuple[pd.DataFrame, pd.DataFrame]:
+    pacientes, citas = cargar_datos()
+    pacientes = manejar_valores_nulos(pacientes, metodo="fill", fill_value="desconocido")
+    citas = manejar_valores_nulos(citas, metodo="drop")
+    pacientes = estandarizar_texto(pacientes, ["nombre", "apellido", "ciudad"])
+    pacientes = limpieza_especifica(pacientes, "telefono", simbolo="$")
+    return pacientes, citas
+
+
+# ----------------------------------------------------------
+# Prueba rápida
+# ----------------------------------------------------------
 if __name__ == "__main__":
-    data = {
-        "nombre": [" Ana ", "JUAN", None],
-        "telefono": ["$123", "$456", "$789"],
-        "edad": [25, None, 30]
-    }
-
-    df = pd.DataFrame(data)
-    print("=== DataFrame original ===")
-    print(df)
-
-    df = manejar_valores_nulos(df, metodo="fill")
-    df = estandarizar_texto(df, ["nombre"])
-    df = limpieza_especifica(df, "telefono", simbolo="$")
-
-    print("\n=== DataFrame limpio ===")
-    print(df)
+    pacientes, citas = cargar_datos_limpios()
+    print("✅ Datos cargados y preprocesados correctamente.")
+    print(pacientes.head())
+    print(citas.head())

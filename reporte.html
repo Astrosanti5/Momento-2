@@ -3,49 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reporte de Análisis de Citas Médicas</title>
+    <title>Reporte de Citas</title>
     <link rel="stylesheet" href="estilos.css">
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.dataTables.min.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
 </head>
 <body>
     <header>
-        <h1>📊 Reporte de Citas Médicas</h1>
-        <p>Visualización generada automáticamente a partir de los datos limpios.</p>
+        <h1>Reporte de Visualización de Datos</h1>
     </header>
-
-    <section class="resumen">
-        <h2>Resumen General de Pacientes</h2>
-        <div id="tabla-container">
-            {{TABLA_HTML}}
-        </div>
-    </section>
 
     <section class="graficos">
         <h2>Visualizaciones de Datos</h2>
 
         <div class="grafico">
             <h3>Frecuencia de Motivos de Cita</h3>
-            <img src="assets/frecuencia_motivos.png" alt="Gráfico de motivos de cita">
+            <canvas id="motivosChart"></canvas>
         </div>
 
         <div class="grafico">
             <h3>Distribución de Citas por Ciudad</h3>
-            <img src="assets/distribucion_ciudad.png" alt="Gráfico de citas por ciudad">
+            <canvas id="ciudadChart"></canvas>
         </div>
     </section>
 
-    <footer>
-        <p>Generado automáticamente por <strong>generar_reporte.py</strong> — Proyecto de Análisis de Datos Médicos.</p>
-    </footer>
-
     <script>
-        $(document).ready(function() {
-            $('table').DataTable({
-                language: { url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json' }
-            });
+        // Gráfico de Frecuencia de Motivos de Cita
+        const ctxMotivos = document.getElementById('motivosChart').getContext('2d');
+        const motivosChart = new Chart(ctxMotivos, {
+            type: 'bar',
+            data: {
+                labels: ['Chequeo preventivo', 'Tratamiento láser', 'Control dermatológico', 'Revisión postoperatoria', 'Consulta estética'],
+                datasets: [{
+                    label: 'Número de citas',
+                    data: [42, 41, 40, 40, 36],
+                    backgroundColor: ['#4e79a7', '#f28e2b', '#e15759', '#76b7b2', '#59a14f'],
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#0066cc',
+                        titleColor: '#fff',
+                        bodyColor: '#fff'
+                    }
+                },
+                scales: {
+                    x: {
+                        title: { display: true, text: 'Motivo', font: { weight: 'bold' } }
+                    },
+                    y: {
+                        title: { display: true, text: 'Número de citas', font: { weight: 'bold' } },
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Gráfico de Distribución de Citas por Ciudad
+        const ctxCiudad = document.getElementById('ciudadChart').getContext('2d');
+        const ciudadChart = new Chart(ctxCiudad, {
+            type: 'bar',
+            data: {
+                labels: ['Ciudad A','Ciudad B','Ciudad C','Ciudad D','Ciudad E','Ciudad F','Ciudad G'],
+                datasets: [{
+                    label: 'Número de citas',
+                    data: [5,4,3,3,2,1,1],
+                    backgroundColor: function(context) {
+                        const value = context.dataset.data[context.dataIndex];
+                        return `rgba(${50 + value*30}, 99, 132, 0.8)`; // degradado dinámico
+                    },
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#00bfff',
+                        titleColor: '#fff',
+                        bodyColor: '#fff'
+                    }
+                },
+                scales: {
+                    x: {
+                        title: { display: true, text: 'Ciudad', font: { weight: 'bold' } }
+                    },
+                    y: {
+                        title: { display: true, text: 'Número de citas', font: { weight: 'bold' } },
+                        beginAtZero: true
+                    }
+                }
+            }
         });
     </script>
 </body>

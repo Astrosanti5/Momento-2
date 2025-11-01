@@ -1,215 +1,132 @@
-# Proyecto: Análisis de Datos - Clínica Dermatológica  
+# 🧠 Proyecto de Análisis y Visualización de Datos Médicos
 
-## Momento 2 - Aplicación de análisis de datos en Python  
+## 📋 Descripción General
 
----
+Este proyecto tiene como objetivo **limpiar, analizar, visualizar y generar reportes automáticos en HTML** a partir de un conjunto de datos médicos previamente procesados.  
+Se emplean librerías como **Pandas**, **Matplotlib** y **Seaborn**, además de técnicas de integración y control de versiones con **Git y GitHub**.
 
-### 📌 Descripción del Proyecto  
-Este proyecto implementa un sistema de análisis de datos para una *clínica dermatológica*.  
-Incluye un módulo de *preprocesamiento* y un script principal (analisis.py) que permiten:  
-
-- Limpiar y preparar datos.  
-- Unir y combinar información de diferentes fuentes (.csv).  
-- Responder preguntas clave de análisis.  
-- Imprimir resultados en consola como evidencia.  
-
-Los datos simulados representan:  
-- Pacientes  
-- Médicos  
-- Consultorios  
-- Clínicas  
-- Diagnósticos  
-- Citas médicas  
+Cada integrante del equipo trabajó en una rama independiente (*feature branch*) de acuerdo a su rol, y todos los desarrollos fueron integrados a las ramas de desarrollo (`Develop`, `Develop1`, `Develop2`, `Develop3`, `Develop4`) siguiendo buenas prácticas de versionamiento.
 
 ---
 
-## 📂 Estructura del Proyecto  
+## 👥 Integrantes del Equipo y Roles
 
-MOMENTO-2/
-│── data/
-│ ├── citas.csv
-│ ├── clinica.csv
-│ ├── consultorio.csv
-│ ├── diagnostico.csv
-│ ├── medico.csv
-│ ├── pacientes.csv
-│── preprocesamiento.py
-│── analisis.py
-│── README.md
-│── .venv/
+| Rol | Integrante | Rama Principal | Archivos / Responsabilidades |
+|------|-------------|----------------|------------------------------|
+| 🧹 **1. Data Engineer (Carga y Limpieza)** | **Santiago Cardona** | `Develop1` → `feature/preprocesamiento-limpio` | `src/preprocesamiento.py` — Revisión y documentación del módulo de limpieza, carga y estandarización de datos. |
+| 📊 **2. Data Analyst (Análisis y Preparación)** | **Jerónimo Giraldo** | `Develop2` | `src/analisis.py` — Ejecución de análisis exploratorios (frecuencias, agrupaciones y conteos). Generación de DataFrames listos para graficar. |
+| 📈 **3. Data Visualizer (Gráficos)** | **Nataly Álvarez** | `Develop3` | `src/visualizacion.py` — Creación del módulo de visualización con gráficos de frecuencia y distribución utilizando Matplotlib/Seaborn. |
+| 🧾 **4. Report Designer (HTML y CSS)** | **George Valle** | `Develop4` | `reporte.html`, `estilos.css`, `src/generar_reporte.py` — Generación del reporte final en HTML que integra gráficos y tablas con estilo visual propio. |
+| 🧠 **5. Documentador / Integrador Git** | **Gustavo Montoya (Tavo)** | `Develop` | `README.md`, `.gitignore`, estructura general — Creación de la rama `develop`, revisión de PRs, merges y documentación del proyecto. |
+
+---
+
+## 🧩 Estructura del Proyecto
+
+📦 proyecto_datos_medicos/
+┣ 📂 data/
+┃ ┣ pacientes.csv
+┃ ┗ citas.csv
+┣ 📂 src/
+┃ ┣ preprocesamiento.py # Carga y limpieza de datos
+┃ ┣ analisis.py # Agrupaciones, conteos y análisis descriptivo
+┃ ┣ visualizacion.py # Creación de gráficos con Matplotlib/Seaborn
+┃ ┗ generar_reporte.py # Ensamble del reporte HTML final
+┣ 📄 reporte.html # Reporte HTML con visualizaciones y tablas
+┣ 📄 estilos.css # Estilos CSS aplicados al reporte
+┣ 📄 requirements.txt # Librerías necesarias
+┣ 📄 README.md # Documentación general del proyecto
+┗ 📄 .gitignore # Archivos y carpetas ignoradas en Git
 
 yaml
 Copiar código
 
 ---
 
-## 🔀 Flujo de Git (Git Flow)  
+## ⚙️ Instalación y Ejecución
 
-El proyecto fue gestionado con *Git Flow*:  
-
-- Rama principal protegida: main  
-- Rama de trabajo base: develop  
-- Ramas de características:  
-  - feature/carga-datos → Función para cargar datos.  
-  - feature/limpieza-datos → Manejo de nulos, estandarización y limpieza.  
-  - feature/analisis-frecuencia → Pregunta de análisis #1.  
-  - feature/analisis-agregacion → Pregunta de análisis #2.  
-  - feature/analisis-filtrado → Pregunta de análisis #3.  
-  - feature/consultas-extras → Últimos 50, intermedios, ciudad con más pacientes.  
-
-Cada rama fue integrada a develop mediante *Pull Requests (PRs)*, y finalmente a main.  
-
----
-
-## ⚙️ Configuración del entorno  
-
-1. Clonar el repositorio:  
-   ```bash
-   git clone <URL_DEL_REPO>
-   cd MOMENTO-2
-Crear y activar entorno virtual:
-
+### 1️⃣ Clonar el repositorio
+```bash
+git clone <URL-del-repositorio>
+cd proyecto_datos_medicos
+2️⃣ Crear y activar entorno virtual (opcional)
 bash
 Copiar código
-python -m venv .venv
-.venv\Scripts\activate   # En Windows
-source .venv/bin/activate   # En Linux/Mac
-Instalar dependencias (pandas):
-
+python -m venv venv
+source venv/bin/activate   # En Linux/Mac
+venv\Scripts\activate      # En Windows
+3️⃣ Instalar dependencias
 bash
 Copiar código
-pip install pandas
-Ejecutar el análisis:
-
+pip install -r requirements.txt
+4️⃣ Ejecutar el flujo de análisis completo
 bash
 Copiar código
-python analisis.py
-🧩 Funcionalidades Clave
-1. Preprocesamiento
-Carga de datos.
+python src/preprocesamiento.py
+python src/analisis.py
+python src/visualizacion.py
+python src/generar_reporte.py
+🧠 Flujo de Trabajo con Git
+Cada integrante trabajó en su rama feature/ correspondiente.
 
-Manejo de valores nulos.
+Las ramas fueron integradas en orden:
 
-Normalización de texto.
+feature/preprocesamiento-limpio → Develop1
 
-Limpieza específica del proyecto.
+feature/analisis-datos → Develop2
 
-2. Análisis
-Preguntas respondidas:
+feature/visualizacion → Develop3
 
-Análisis de Frecuencia: elemento con mayor cantidad de registros (ejemplo: diagnóstico más repetido).
+feature/reporte-html → Develop4
 
-Agregación: métrica agrupada por categoría (ejemplo: número total de citas por médico).
+Finalmente, Gustavo Montoya (Integrador) fusionó todas las ramas en Develop, verificó la estructura final y actualizó la documentación.
 
-Filtrado + Conteo: segmentación por condición (ejemplo: cuántos pacientes están en tratamiento dermatológico).
+Se generó un Pull Request desde Develop hacia main como entrega final.
 
-3. Consultas Extra
-Número total de controles dermatológicos: 48
+🎨 Resultados Visuales
+El reporte final (reporte.html) incluye:
 
-Últimos 50 registros.
+Tablas interactivas exportadas desde Pandas.
 
-50 intermedios.
+Gráficos de barras y distribuciones generados con Matplotlib y Seaborn.
 
-Ciudad con más pacientes.
+Estilo visual limpio y moderno definido en estilos.css.
 
-📝 Paso a paso: Cómo registrar nueva información
-Nueva cita
+(Opcional) Integración con DataTables.js para ordenar, filtrar y paginar las tablas.
 
-Abrir citas.csv
+📚 Librerías Principales
+Pandas → Limpieza, análisis y exportación de datos.
 
-Agregar una fila con: ID_CITA, ID_PACIENTE, ID_MEDICO, FECHA, CONSULTORIO, DIAGNOSTICO
+Matplotlib / Seaborn → Visualización de gráficos.
 
-Nuevo paciente
+Jinja2 / HTML / CSS → Generación del reporte HTML.
 
-Abrir pacientes.csv
+Git / GitHub → Control de versiones y gestión colaborativa.
 
-Agregar fila con: ID_PACIENTE, NOMBRE, EDAD, GENERO, CIUDAD
+🧹 Buenas Prácticas del Proyecto
+Uso del flujo de ramas: main → develop → feature/*
 
-Nuevo médico
+Commits descriptivos y PRs revisados antes del merge.
 
-Abrir medico.csv
+Documentación actualizada en cada entrega.
 
-Agregar fila con: ID_MEDICO, NOMBRE, ESPECIALIDAD, CLINICA
+Archivos temporales y datos sensibles excluidos mediante .gitignore.
 
-Nueva clínica
+🏁 Conclusión
+El proyecto demuestra la integración completa de un flujo de análisis de datos:
 
-Abrir clinica.csv
+Carga y limpieza de datos (Data Engineer).
 
-Agregar fila con: ID_CLINICA, NOMBRE, CIUDAD
+Análisis exploratorio (Data Analyst).
 
-Nuevo diagnóstico
+Visualización efectiva (Data Visualizer).
 
-Abrir diagnostico.csv
+Presentación profesional del resultado (Report Designer).
 
-Agregar fila con: ID_DIAGNOSTICO, NOMBRE_DIAGNOSTICO
+Integración y documentación final (Documentador Git).
 
-Nuevo consultorio
+El producto final es un reporte HTML autocontenido, con datos limpios, gráficos claros y una presentación coherente.
 
-Abrir consultorio.csv
-
-Agregar fila con: ID_CONSULTORIO, NUMERO, PISO, CLINICA
-
-💻 Bloque final de código (analisis.py)
-Este bloque imprime la evidencia extra:
-
-python
-Copiar código
-import pandas as pd
-
-# Cargar datos principales
-pacientes = pd.read_csv("data/pacientes.csv")
-citas = pd.read_csv("data/citas.csv")
-
-print("\n=== CONSULTAS EXTRA ===")
-
-# Últimos 50 registros
-print("\n🔹 Últimos 50 registros de citas:")
-print(citas.tail(50))
-
-# 50 registros intermedios
-mitad = len(citas) // 2
-print("\n🔹 50 registros intermedios de citas:")
-print(citas.iloc[mitad:mitad+50])
-
-# Ciudad con más pacientes
-print("\n🔹 Ciudad con más pacientes registrados:")
-print(pacientes["CIUDAD"].value_counts().head(1))
-📊 Ejemplo de salida esperada
-yaml
-Copiar código
-=== CONSULTAS EXTRA ===
-
-🔹 Últimos 50 registros de citas:
-     ID_CITA   ID_PACIENTE   ID_MEDICO   FECHA   CONSULTORIO   DIAGNOSTICO
-200  201 ...   ...
-
-🔹 50 registros intermedios de citas:
-     ID_CITA   ID_PACIENTE   ...
-
-🔹 Ciudad con más pacientes registrados:
-Bogotá    120
-Name: CIUDAD, dtype: int64
-✅ Con este README.md tienes:
-
-Documentación del proyecto.
-
-Explicación de Git Flow con ramas.
-
-Paso a paso para agregar registros.
-
-Código final integrado en analisis.py.
-
-Ejemplo de resultados en consola.
-
-yaml
-Copiar código
-
----
-
-Ahora tu README no tiene:  
-- Bloques yaml innecesarios.  
-- "Copiar código" duplicado.  
-- Numeración mal indentada.  
-- Comentarios dentro de bloques que rompen Markdown.  
-
-👉 Con este formato ya no deberías ver alertas en VS Code ni en GitHub.  
+✍️ Autor del README y Documentación:
+Gustavo Montoya (Tavo)
+📅 Versión final integrada — Octubre 2025
